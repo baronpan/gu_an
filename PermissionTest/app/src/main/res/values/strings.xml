@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">PermissionTest</string>
+    <string name="perm_label">aaa</string>
+    <string name="perm_desc">bbb</string>
+</resources>
