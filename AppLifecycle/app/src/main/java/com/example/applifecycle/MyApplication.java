@@ -10,6 +10,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import dalvik.system.BaseDexClassLoader;
+
 /**
  * Created by j1gsaw on 2017/10/12.
  */
@@ -58,12 +60,18 @@ public class MyApplication extends Application {
                 Field m_ClassLoader = cLoadedApk.getDeclaredField("mClassLoader");
                 m_ClassLoader.setAccessible(true);
                 MyClassLoader mLoader = new MyClassLoader();
-                mLoader.setBaseClassLoader((ClassLoader)m_ClassLoader.get(obj_LoadedApk));
+                ClassLoader cl_origin = (ClassLoader)m_ClassLoader.get(obj_LoadedApk);
+                mLoader.setBaseClassLoader(cl_origin);
                 m_ClassLoader.set(obj_LoadedApk, mLoader);
 
                 Field m_Application = cLoadedApk.getDeclaredField("mApplication");
                 m_Application.setAccessible(true);
                 Log.d("Test", "LoadedApk mApplication is " + (m_Application.get(obj_LoadedApk) == null ? "null":"not null"));
+
+                final Class<?> cBaseDexClassLoader = Class.forName("dalvik.system.BaseDexClassLoader");
+                final Method m_getLdLibraryPath = cBaseDexClassLoader.getDeclaredMethod("getLdLibraryPath");
+                String strLdLibPath = (String)m_getLdLibraryPath.invoke(cl_origin);
+                Log.d("Test", "LdLibraryPath is : " + strLdLibPath);
             } else {
                 Log.d("Test", "mPackages is null");
             }
@@ -94,5 +102,15 @@ public class MyApplication extends Application {
         //Thread.dumpStack();
 
         super.onCreate();
+
+        BaseDexClassLoader clBase = (BaseDexClassLoader)ClassLoader.getSystemClassLoader();
+        try {
+            final Class<?> cBaseDexClassLoader = Class.forName("dalvik.system.BaseDexClassLoader");
+            final Method m_getLdLibraryPath = cBaseDexClassLoader.getDeclaredMethod("getLdLibraryPath");
+            String strLdLibPath = (String)m_getLdLibraryPath.invoke(clBase);
+            Log.d("Test", "LdLibraryPath is : " + strLdLibPath);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
