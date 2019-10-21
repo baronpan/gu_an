@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">WeakComponent</string>
+    <string name="title_activity_exported">ExportedActivity</string>
+</resources>
